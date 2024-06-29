@@ -1,5 +1,5 @@
-﻿using _sever.EF_Core.CuisineMenu;
-using _sever.entity;
+﻿using _sever.Dto;
+using _sever.EF_Core.CuisineMenu;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;

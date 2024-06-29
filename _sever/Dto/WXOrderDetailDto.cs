@@ -1,6 +1,7 @@
 ﻿using _sever.EF_Core.CuisineMenu;
+using _sever.entity;
 
-namespace _sever.entity
+namespace _sever.Dto
 {
     public class WXOrderDetailDto
     {

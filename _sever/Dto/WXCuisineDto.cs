@@ -1,6 +1,6 @@
 ﻿using _sever.EF_Core.CuisineMenu;
 
-namespace _sever.entity
+namespace _sever.Dto
 {
     public class WXCuisineDto
     {

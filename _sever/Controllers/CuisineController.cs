@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using _sever.entity;
 using _sever.EF_Core.CuisineMenu;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.StaticFiles;
+using _sever.Vo;
 
 namespace _sever.Controllers
 {

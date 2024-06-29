@@ -17,11 +17,10 @@ using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Http.Features;
 using NLog.Extensions.Logging;
-using _sever.entity;
-using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
-using System;
 using _sever.Validator;
+using _sever.Dto;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -111,7 +110,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 
 //多人点餐共享的数据
-builder.Services.AddSingleton<Dictionary<string,List<WXOrderDetailDto>>>();
+builder.Services.AddSingleton<Dictionary<string,List<WXShoppingCarDto>>>();
 //储存AutoRestEvent的字典，用于锁定订单
 builder.Services.AddSingleton<Dictionary<string,AutoResetEvent>>();
 

@@ -1,5 +1,6 @@
-﻿namespace _sever.entity
+﻿namespace _sever.Vo
 {
+    //弃用
     public class WXOrderDetailVo
     {
         //cuisineId
@@ -8,6 +9,6 @@
         public string Nickname { get; set; }
         public string AvatarUrl { get; set; }
         public string Session_key { get; set; }
-        
+
     }
 }

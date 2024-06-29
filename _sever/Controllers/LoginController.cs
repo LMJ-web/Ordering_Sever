@@ -1,4 +1,4 @@
-﻿using _sever.entity;
+﻿using _sever.Vo;
 using IdentityFramework;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

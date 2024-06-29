@@ -1,4 +1,4 @@
-﻿namespace _sever.entity
+﻿namespace _sever.Dto
 {
     public class OrderDto
     {
