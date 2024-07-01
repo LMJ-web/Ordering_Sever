@@ -5,5 +5,5 @@
 1、后台系统使用.NET Core WebAPI开发，客户端微信小程序使用Uniapp开发，后台管理员页面使用Vue3+Element-UI实现。
 2、关系型数据库选择SQL Server2022，持久层使用EF Core框架。
 3、使用IdentifyFramework框架实现用户认证和权限校验功能。
-4、使用Redis数据库缓存热点数据，降低服务器压力。
+4、使用Redis数据库缓存热点数据。
 5、使用Swagger进行接口测试。
