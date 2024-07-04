@@ -14,4 +14,4 @@
 项目截图
 -
 Swagger接口管理  
-![Swagger](/_server/Srceenshot/Swagger.png)
+![Swagger](/_sever/Screenshot/Swagger.png)
