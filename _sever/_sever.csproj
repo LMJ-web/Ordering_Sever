@@ -44,4 +44,8 @@
     <None Include="D:\VisualStudioProject\_sever\_sever\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Screenshot\" />
+  </ItemGroup>
+
 </Project>
