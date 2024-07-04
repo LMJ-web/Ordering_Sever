@@ -1,13 +1,12 @@
-﻿using _sever.EF_Core.NavigationMenu;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace _sever.EF_Core.CuisineMenu
 {
     public class CuisineDbContext:DbContext
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration configuration;
         public CuisineDbContext(DbContextOptions<CuisineDbContext> options,IConfiguration configuration) : base(options) { 
-        this._configuration = configuration;
+        this.configuration = configuration;
         }
 
         public DbSet<Cuisine> Cuisines { get; set; }
@@ -17,8 +16,7 @@ namespace _sever.EF_Core.CuisineMenu
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            //string connStr = "Server=LMJ\\SQLEXPRESS;Database=Db;Trusted_Connection=True;";
-            string connStr = _configuration.GetValue<string>("connStr");
+            string connStr = configuration.GetValue<string>("connStr");
             optionsBuilder.UseSqlServer(connStr);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

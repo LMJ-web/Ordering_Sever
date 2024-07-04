@@ -7,6 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_sever", "_sever\_sever.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityFramework", "IdentityFramework\IdentityFramework.csproj", "{27B8F4BA-21DC-439D-A638-45C6FD6B385A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scrennshot", "Scrennshot", "{658D19F2-0B06-4821-892C-9A547153DC7A}"
+	ProjectSection(SolutionItems) = preProject
+		..\项目截图\Swagger.png = ..\项目截图\Swagger.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
