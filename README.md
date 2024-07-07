@@ -38,11 +38,144 @@ public async Task<IActionResult> CheckUser(LoginVo loginVo)
     return Ok(token);
 }
 ```
+Program.cs文件中注册校验中间件
+```C#
+app.UseAuthentication();
+app.UseAuthorization();
+```
 用特性声明限制访问的接口。以下接口，仅限具有admin角色的用户才能访问
 ```C#
 [Authorize(Roles = "admin")]
 public async Task<IActionResult> AddUser(UserVo userVo){}
 ```
+* 接口限流
+  
+使用AspNetCoreRateLimit中间件实现接口限流，每个IP 1秒内只能请求10次。限流配置如下appsettings.json
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "IpRateLimiting": {
+    "EnableEndpointRateLimiting": true,
+    "StackBlockedRequests": false,
+    "RealIpHeader": "X-Real-IP",
+    "ClientIdHeader": "X-ClientId",
+    "HttpStatusCode": 429,
+    "IpWhitelist": [],
+    "EndpointWhitelist": ["*:/Hub/MyHub"],
+    "ClientWhitelist": [],
+    "GeneralRules": [
+      {
+        "Endpoint": "*",
+        "Period": "1s",
+        "Limit": 10
+      },
+      {
+        "Endpoint": "*",
+        "Period": "15m",
+        "Limit": 100
+      },
+      {
+        "Endpoint": "*",
+        "Period": "12h",
+        "Limit": 1000
+      },
+      {
+        "Endpoint": "*",
+        "Period": "7d",
+        "Limit": 10000
+      }
+    ]
+  }
+}
+```
+Program.cs文件中配置限流服务，并注册RateLimit中间件
+```C#
+//1、读取限制普通Ip的配置信息并注册
+builder.Services.Configure<IpRateLimitOptions>(configurationRoot.GetSection("IpRateLimiting"));
+
+//使用RateLimit中间件
+app.UseIpRateLimiting();
+```
+* 日志模块
+   
+使用NLog实现日志模块，配置如下nlog.config
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      autoReload="true"
+      internalLogLevel="Info"
+      internalLogFile="c:\temp\internal-nlog-AspNetCore.txt">
+
+	<!-- enable asp.net core layout renderers -->
+	<extensions>
+		<add assembly="NLog.Web.AspNetCore"/>
+	</extensions>
+
+	<!-- the targets to write to -->
+	<targets>
+		<!-- File Target for all log messages with basic details -->
+		<!--所有日志-->
+		<target xsi:type="File" name="allfile" fileName="nlog-AspNetCore-all-${shortdate}.log"
+				layout="${longdate}|${event-properties:item=EventId:whenEmpty=0}|${level:uppercase=true}|${logger}|${message} ${exception:format=tostring}" />
+
+		<!-- File Target for own log messages with extra web details using some ASP.NET core renderers -->
+		<!--与web有关的日志-->
+		<target xsi:type="File" name="ownFile-web" fileName="nlog-AspNetCore-own-${shortdate}.log"
+				layout="${longdate}|${event-properties:item=EventId:whenEmpty=0}|${level:uppercase=true}|${logger}|${message} ${exception:format=tostring}|url: ${aspnet-request-url}|action: ${aspnet-mvc-action}" />
+
+		<!--向控制台输出的log -->
+		<target xsi:type="Console" name="lifetimeConsole" layout="${MicrosoftConsoleLayout}" />
+	</targets>
+
+	<!-- rules to map from logger name to target -->
+	<rules>
+		<!--All logs, including from Microsoft-->
+		<logger name="*" minlevel="Trace" writeTo="allfile" />
+
+		<!--Output hosting lifetime messages to console target for faster startup detection -->
+		<logger name="Microsoft.Hosting.Lifetime" minlevel="Info" writeTo="lifetimeConsole, ownFile-web" final="true" />
+
+		<!--可忽略的log-->
+		<logger name="Microsoft.*" maxlevel="Info" final="true" />
+		<logger name="System.Net.Http.*" maxlevel="Info" final="true" />
+
+		<logger name="*" minlevel="Trace" writeTo="ownFile-web" />
+	</rules>
+</nlog>
+```
+Program.cs文件中注册NLog服务
+```C#
+builder.Services.AddLogging(configure =>
+{
+    configure.AddNLog();    //日志输出到多target，在nlog.config文件中配置
+});
+```
+在接口中使用NLog服务。例如用户登录失败时，记录失败原因
+```C#
+[ApiController]
+[Route("[controller]/[action]")]
+public class LoginController:ControllerBase
+{
+  private readonly ILogger<LoginController> logger;
+  public LoginController(UserManager<User> userManager, IDistributedCache _cache, ILogger<LoginController> logger,IConfiguration configuration)
+  {
+    this.logger = logger;
+  }
+  public async Task<IActionResult> CheckUser(LoginVo loginVo)
+  {
+    logger.LogInformation($"用户：'{loginVo.UserName}'验证码错误");
+    return BadRequest("验证码错误！");
+  }
+}
+```
+
 
 项目截图
 -
