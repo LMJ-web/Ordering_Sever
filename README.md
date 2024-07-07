@@ -11,6 +11,39 @@
 4、使用Redis数据库缓存热点数据。  
 5、使用Swagger进行接口测试。
 
+功能点
+-
+* 权限校验
+  
+用户登录成功时，生成包含用户角色的Token并写入前端session中，后续只有具有相应角色属性的用户才能访问相关接口。
+```C#
+public async Task<IActionResult> CheckUser(LoginVo loginVo)
+{
+    //用户名密码正确  
+    //获取用户的角色
+    IList<string> roleList = await userManager.GetRolesAsync(userInDb);
+    //生成并返回token
+    List<Claim> claimList = new List<Claim>();
+    claimList.Add(new Claim(ClaimTypes.Name, loginVo.UserName));
+    foreach (string role in roleList)
+    {
+      claimList.Add(new Claim(ClaimTypes.Role, role));
+    }
+    string tokenSecretKey = configuration.GetValue<string>("tokenSecretKey");
+    SymmetricSecurityKey secKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSecretKey));
+    var credential = new SigningCredentials(secKey, SecurityAlgorithms.HmacSha256Signature);
+    DateTime expire = DateTime.Now.AddDays(1);
+    JwtSecurityToken tokenDescriptor = new JwtSecurityToken(claims: claimList, expires: expire, signingCredentials: credential);
+    string token = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+    return Ok(token);
+}
+```
+用特性声明限制访问的接口。以下接口，仅限具有admin角色的用户才能访问
+```C#
+[Authorize(Roles = "admin")]
+public async Task<IActionResult> AddUser(UserVo userVo){}
+```
+
 项目截图
 -
 * Swagger接口管理  
