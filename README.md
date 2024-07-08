@@ -175,6 +175,44 @@ public class LoginController:ControllerBase
   }
 }
 ```
+* 图片上传限制
+
+添加菜品时，需要对菜品图片的类型和大小做限制
+```C#
+//注册文件上传类型白名单服务，在文件上传接口调用该服务
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".jpg"] = "image/jpeg";
+provider.Mappings[".jpeg"] = "image/jpeg";
+provider.Mappings[".png"] = "image/png";
+provider.Mappings[".webp"] = "image/webp";
+builder.Services.AddSingleton(provider);
+
+//.NetCore默认文件上传限制为30Mb，只需要改配置，框架自动读取。
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 20480000;
+    options.MultipartHeadersCountLimit = 200;
+    options.MultipartHeadersLengthLimit = 204800;
+    options.MultipartBoundaryLengthLimit = 1024;
+    options.ValueLengthLimit = 2048000;
+    options.MemoryBufferThreshold = 1024;
+});
+```
+在上传图片接口调用校验服务
+```C#
+//依赖注入单例
+public readonly FileExtensionContentTypeProvider provider;
+
+[HttpPost]
+[Authorize(Roles = "admin")]
+public IActionResult UploadPicture(IFormFile file)
+{
+  if (!provider.TryGetContentType(file.FileName, out _))
+  {
+    return BadRequest("上传的文件类型错误！");
+  }
+}
+```
 
 
 项目截图
