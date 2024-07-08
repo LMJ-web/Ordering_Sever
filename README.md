@@ -1,7 +1,7 @@
 简介
 -
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本项目是一个堂食点餐系统，实现了顾客浏览菜品、添加购物车、多人协同点餐、提交订单、查看历史订单；管理员管理菜品信息、查看订单中心、员工管理等业务。
-同时补充了用户认证(Authentication)、角色权限校验(Authorization)、接口流量限流(RateLimit)、日志管理(NLog)、实时数据刷新等功能。
+同时补充了用户认证(Authentication)、角色权限校验(Authorization)、接口流量限流(RateLimit)、日志管理(NLog)、数据实时刷新等功能。
 
 技术架构
 -
@@ -212,6 +212,39 @@ public IActionResult UploadPicture(IFormFile file)
     return BadRequest("上传的文件类型错误！");
   }
 }
+```
+* 数据实时刷新
+
+多人协同点餐时，某顾客点餐后同桌的其他顾客需要及时同步点餐数据。使用SignalR中间件实现数据实时刷新功能流程如下：  
+1、客户端和服务器端使用SignalR组件建立WebSocket连接。  
+2、服务器端将同餐桌的连接分为同一个group。  
+3、顾客顾客点餐时向服务器端发送餐桌号，服务器端向同组的其他客户端发送signal。  
+4、客户端收到服务器端发送的signal后，发起http请求获取最新数据。
+```C#
+namespace _sever.MyHub
+{
+    public class MyHub : Hub
+    {
+        public async Task AddConnectionToGroup(string table, string nickname, string avatarUrl)
+        {
+             await this.Groups.AddToGroupAsync(this.Context.ConnectionId, table);
+             await this.Clients.Client(this.Context.ConnectionId).SendAsync("sameTableCustomer", nickname, avatarUrl);
+        }
+        public async Task NotifySameTableCustomer(string tableNo)
+        {
+            await this.Clients.GroupExcept(tableNo, new List<string> { this.Context.ConnectionId }).SendAsync("IsRefreshOrderDetails", true);
+        }
+        public async Task RefreshOrderState(bool state)
+        {
+            await this.Clients.All.SendAsync("refreshOrderState", state);
+            
+        }
+    }
+}
+```
+Program.cs文件配置Hub中间件映射
+```C#
+app.MapHub<MyHub>("/Hub/MyHub");
 ```
 
 
