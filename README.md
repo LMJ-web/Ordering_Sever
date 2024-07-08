@@ -288,7 +288,5 @@ app.MapHub<MyHub>("/Hub/MyHub");
   
 * 个人历史订单    
 ![HistoryOrder](/_sever/Screenshot/HistoryOrder.png)
-  
-* 历史订单明细  
-![HistoryOrderDetail](/_sever/Screenshot/HistoryOrderDetail.png)
+
 
